@@ -101,6 +101,14 @@ export const WorldScene = new Phaser.Class({
     }
     this.physics.add.overlap(this.player, this.spawns, this.onEnemyMeet, false, this);
 
+    this.sys.events.on('wake', this.wake, this);
+  },
+
+  wake() {
+    this.cursor.left.reset();
+    this.cursor.right.reset();
+    this.cursor.up.reset();
+    this.cursor.down.reset();
   },
 
   update(time, delta) {

@@ -7,44 +7,6 @@ require('babel-core/register');
 require('babel-polyfill');
 
 
-
-export const FightScene = new Phaser.Class({
-  Extends: Phaser.Scene,
-
-  initialize:
-
-  function FightScene() {
-    Phaser.Scene.call(this, { key: 'FightScene' });
-  },
-
-  preload() {
-    console.debug('Preload');
-    /*
-    this.load.image('hero1', 'assets/HeroFrall.png');
-    this.load.image('hero2', 'assets/HeroLix.png');
-    this.load.image('enemy1', 'assets/enmyTard.png');
-    this.load.image('enemy2', 'assets/enmySpooks.png');
-    */
-    this.load.spritesheet('hero1_frames', 'assets/HeroFrall_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('hero2_frames', 'assets/HeroLix_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('enemy1_frames', 'assets/enmyTard_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('enemy2_frames', 'assets/enmySpooks_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-  },
-
-  create() {
-    console.debug('Create');
-    this.scene.start('BattleScene');
-  }
-});
-
 export const BattleScene = new Phaser.Class({
   Extends: Phaser.Scene,
 
@@ -80,6 +42,8 @@ export const BattleScene = new Phaser.Class({
     console.debug('Create');
     this.cameras.main.setBackgroundColor('rgba(0, 200, 0, 0.5)');
     this.startBattle();
+
+    let lost = false;
     
     this.sys.events.on('wake', this.startBattle, this);
   },
@@ -110,21 +74,21 @@ export const BattleScene = new Phaser.Class({
   startBattle() {
     // Heroes
     const fralle = new PlayerCharacter(
-      this, 250, 50, 'hero1_frames', 0, 'Fralle', 'Water', 200, 30, 1);
+      this, 250, 50, 'hero1_frames', 0, 'Fralle', 'Water', 2, 30, 1);
       // this, x, y, assets, frame, name, element, hp, damage, health packs);
     this.add.existing(fralle);
 
     const felix = new PlayerCharacter(
-      this, 250, 100, 'hero2_frames', 0, 'Felix', 'Fire', 200, 30, 1);
+      this, 250, 100, 'hero2_frames', 0, 'Felix', 'Fire', 2, 30, 1);
     this.add.existing(felix);
 
     // Enemies
     const spooks = new Enemy(
-      this, 50, 50, 'enemy1_frames', 0, 'Spooks', 'Normal', 10, 30, 1);
+      this, 50, 50, 'enemy1_frames', 0, 'Spooks', 'Normal', 100, 30, 1);
     this.add.existing(spooks);
 
     const zombs = new Enemy( // HP SET TO 9
-      this, 50, 100, 'enemy2_frames', 0, 'Zombs', 'Earth', 10, 30, 1);
+      this, 50, 100, 'enemy2_frames', 0, 'Zombs', 'Earth', 100, 30, 1);
     this.add.existing(zombs);
 
     this.heroes = [fralle, felix];
@@ -155,21 +119,34 @@ export const BattleScene = new Phaser.Class({
         loose = false;
       }
     }
+    if(loose) {
+      this.lost = true;
+    }
     return win || loose;
   },
 
   endBattle() {
     this.heroes.length = 0;
-    this.heroes.length = 0;
+    this.enemies.length = 0;
 
     for(var i = 0; i < this.units.length; i++) {
       this.units[i].destroy();
     }
     this.units.length = 0;
     this.scene.sleep('UIScene');
-    this.scene.switch('WorldScene');
-  },
 
+    //TODO fix deathscene
+    if(this.lost)
+    {
+      this.lost = false;
+      this.scene.sleep('WorldScene');
+      this.scene.switch('DeathScene');
+    }
+    else {
+      this.scene.switch('WorldScene');
+    }
+  },
+  /*
   exitBattle() {
     this.scene.sleep('UIScene');
     this.scene.switch('WorldScene');
@@ -179,7 +156,7 @@ export const BattleScene = new Phaser.Class({
     this.scene.run('UIScene');
     this.time.addEvent({delay: 2000, callback: this.exitBattle, callbackScope: this});        
   },
-
+  */
   receivePlayerSelection(action, target) {
     if (action === 'attack') {
       this.units[this.index].attack(this.enemies[target]);
@@ -419,6 +396,7 @@ const Menu = new Phaser.Class({
     this.heroes = heroes;
     this.x = x;
     this.y = y;
+    this.selected = false;
   },
 
   addMenuItem(unit) {
@@ -437,35 +415,17 @@ const Menu = new Phaser.Class({
       }
     } while(!this.menuItems[this.menuItemIndex].active);
     this.menuItems[this.menuItemIndex].select();
-
-    /*
-    this.menuItemIndex -= 1;
-
-    if (this.menuItemIndex < 0) {
-      this.menuItemIndex = this.menuItems.length - 1;
-    }
-    this.menuItems[this.menuItemIndex].select();
-    */
   },
 
   moveSelectionDown() {
     this.menuItems[this.menuItemIndex].deselect();
     do {
       this.menuItemIndex++;
-      if(this.menuItemIndex > this.menuItems.length) {
+      if(this.menuItemIndex >= this.menuItems.length) {
         this.menuItemIndex = 0;
       } 
     } while(!this.menuItems[this.menuItemIndex].active);
     this.menuItems[this.menuItemIndex].select();
-    
-    /*
-    this.menuItemIndex += 1;
-
-    if (this.menuItemIndex >= this.menuItems.length) {
-      this.menuItemIndex = 0;
-    }
-    this.menuItems[this.menuItemIndex].select();
-    */
   },
 
   select(index) {
@@ -483,16 +443,6 @@ const Menu = new Phaser.Class({
         }        
         this.menuItems[this.menuItemIndex].select();
         this.selected = true;
-
-    /*
-    if (!index) {
-      index = 0;
-    }
-    
-    this.menuItems[this.menuItemIndex].deselect();
-    this.menuItemIndex = index;
-    this.menuItems[this.menuItemIndex].select();
-    */
   },
 
   deselect() {
@@ -504,12 +454,12 @@ const Menu = new Phaser.Class({
   confirm() {
     // when player selects, do the action
   },
-
+  /*
   undo() {
     // When player wants to undo selection
     // this.currentMenu = this.ActionsMenu; //FUNGERAR INTE
   },
-
+  */
   clear() {
     for (let i = 0; i < this.menuItems.length; i += 1) {
       this.menuItems[i].destroy();
@@ -725,7 +675,7 @@ export const UIScene = new Phaser.Class({
   },
 
   onKeyInput(event) {
-    if (this.currentMenu) {
+    if (this.currentMenu && this.currentMenu.selected) {
       if (event.code === 'ArrowUp') {
         this.currentMenu.moveSelectionUp();
       } else if (event.code === 'ArrowDown') {
@@ -734,7 +684,7 @@ export const UIScene = new Phaser.Class({
         // this.scene.start(ActionsMenu); // Does nothing
         // this.currentMenu.clear(); // Breaks things
         console.log('ArrowRight logged');
-        this.currentMenu.undo();
+        //this.currentMenu.undo();
       } else if (event.code === 'Space' || event.code === 'ArrowLeft') {
         this.currentMenu.confirm();
       }
@@ -742,33 +692,7 @@ export const UIScene = new Phaser.Class({
   },
 
 });
-/*
-export const pauseScene = new Phaser.Class({
 
-  Extends: Phaser.Scene,
-
-  initialize:
-
-  function pauseScene() {
-    Phaser.Scene.call(this, { key: 'PauseScene' });
-  },
-
-  create(){
-    console.debug('Create');
-
-    this.graphics = this.add.graphics();
-    this.graphics.lineStyle(1, 0xffffff, 1);
-    this.graphics.fillStyle(0x031f4c, 1);
-    this.graphics.strokeRect(300, 220, 160, 120);
-    this.graphics.fillRect(300, 220, 160, 120);
-
-    this.menus = this.add.container();
-
-    this.pauseMenu = new pauseMenu(195, 153, this);
-  },
-
-});
-*/
 export const Message = new Phaser.Class({
 
   Extends: Phaser.GameObjects.Container,

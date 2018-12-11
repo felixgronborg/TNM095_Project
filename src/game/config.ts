@@ -1,6 +1,7 @@
 import { GameScene, WorldScene } from '@/scenes/GameScene';
 import { FightScene, BattleScene, UIScene } from '@/scenes/FightScene';
 import { MenuScene } from '@/scenes/MenuScene';
+import { DeathScene } from '@/scenes/DeathScene';
 // import { EnemyAI } from '@/scenes/BehaviouTree';
 
 /**
@@ -10,10 +11,12 @@ export const phaserConfig: GameConfig = {
   parent: 'app', // content??
   type: Phaser.AUTO, // AUTO
   scene: [MenuScene,
+          DeathScene,
           GameScene,
           WorldScene,
           BattleScene,
-          UIScene], // GameScene
+          UIScene
+          ], // GameScene
   width: 320, // 1024
   height: 240, // 576
   zoom: 2,
