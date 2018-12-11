@@ -6,10 +6,6 @@ import { BehaviorTreeBuilder, BehaviorTreeStatus, TimeData } from 'fluent-behavi
 require('babel-core/register');
 require('babel-polyfill');
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 2f377bde184d8a7a041d6adba64cf9c565302417
 export const BattleScene = new Phaser.Class({
   Extends: Phaser.Scene,
 
@@ -75,37 +71,21 @@ export const BattleScene = new Phaser.Class({
   startBattle() {
     // Heroes
     const fralle = new PlayerCharacter(
-<<<<<<< HEAD
-      this, 250, 50, 'hero1_frames', 0, 'Fralle', 'Water', 2, 30, 1);
-=======
       this, 250, 50, 'hero_frames', 1, 'Fralle', 'Water', 200, 30, 1);
->>>>>>> 2f377bde184d8a7a041d6adba64cf9c565302417
       // this, x, y, assets, frame, name, element, hp, damage, health packs);
     this.add.existing(fralle);
 
     const felix = new PlayerCharacter(
-<<<<<<< HEAD
-      this, 250, 100, 'hero2_frames', 0, 'Felix', 'Fire', 2, 30, 1);
-=======
       this, 250, 100, 'hero_frames', 4, 'Felix', 'Fire', 200, 30, 1);
->>>>>>> 2f377bde184d8a7a041d6adba64cf9c565302417
     this.add.existing(felix);
 
     // Enemies
     const spooks = new Enemy(
-<<<<<<< HEAD
-      this, 50, 50, 'enemy1_frames', 0, 'Spooks', 'Normal', 100, 30, 1);
-    this.add.existing(spooks);
-
-    const zombs = new Enemy( // HP SET TO 9
-      this, 50, 100, 'enemy2_frames', 0, 'Zombs', 'Earth', 100, 30, 1);
-=======
       this, 50, 50, 'enemy_frames', 60, 'Spooks', 'Normal', 10, 30, 1);
     this.add.existing(spooks);
 
     const zombs = new Enemy( // HP SET TO 9
       this, 50, 100, 'enemy_frames', 61, 'Zombs', 'Earth', 10, 30, 1);
->>>>>>> 2f377bde184d8a7a041d6adba64cf9c565302417
     this.add.existing(zombs);
 
     this.heroes = [fralle, felix];
