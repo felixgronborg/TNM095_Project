@@ -1,30 +1,28 @@
 import { BlendModes } from 'phaser';
 
 export const GameScene = new Phaser.Class({
- 
+
   Extends: Phaser.Scene,
 
   initialize:
 
-  function GameScene ()
-  {
-      Phaser.Scene.call(this, { key: 'GameScene' });
+  function GameScene() {
+    Phaser.Scene.call(this, { key: 'GameScene' });
   },
 
-  preload: function () {
+  preload() {
       // map tiles
-      this.load.image('tiles', 'assets/map/spritesheet.png');
-        
-      // map in json format
-      this.load.tilemapTiledJSON('map', 'assets/map/map.json');
-      
-      // our two characters
-      this.load.spritesheet('player', 'assets/RPG_assets.png', { frameWidth: 16, frameHeight: 16 });
-      
+    this.load.image('tiles', 'assets/map/spritesheet.png');
+
+    // map in json format
+    this.load.tilemapTiledJSON('map', 'assets/map/map.json');
+
+    // our two characters
+    this.load.spritesheet('player', 'assets/Heroes.png', { frameWidth: 16, frameHeight: 16 });
   },
 
-  create: function () {
-      this.scene.start('WorldScene');
+  create() {
+    this.scene.start('WorldScene');
   }
 });
 
@@ -34,21 +32,17 @@ export const WorldScene = new Phaser.Class({
 
   initialize:
 
-  function WorldScene ()
-  {
-      Phaser.Scene.call(this, { key: 'WorldScene' });
+  function WorldScene() {
+    Phaser.Scene.call(this, { key: 'WorldScene' });
   },
-  preload: function ()
-  {
-      
-  },
-  create: function () {
-    var map = this.make.tilemap({ key: 'map' });
+  preload() {},
+  create() {
+    const map = this.make.tilemap({ key: 'map' });
 
-    var tiles = map.addTilesetImage('spritesheet', 'tiles');
-        
-	  var grass = map.createStaticLayer('Grass', tiles, 0, 0);
-    var obstacles = map.createStaticLayer('Obstacles', tiles, 0, 0);
+    const tiles = map.addTilesetImage('spritesheet', 'tiles');
+
+	  const grass = map.createStaticLayer('Grass', tiles, 0, 0);
+    const obstacles = map.createStaticLayer('Obstacles', tiles, 0, 0);
     obstacles.setCollisionByExclusion([-1]);
 
     this.player = this.physics.add.sprite(50, 100, 'player', 6);
@@ -63,21 +57,21 @@ export const WorldScene = new Phaser.Class({
     this.cameras.main.startFollow(this.player);
     this.cameras.main.roundPixels = true;
 
-    //  animation with key 'left', we don't need left and right as we will use one and flip the sprite
+    // animation with key 'left', we don't need left and right as we will use one and flip the sprite
     this.anims.create({
       key: 'left',
       frames: this.anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13]}),
       frameRate: 10,
       repeat: -1
     });
-  
+
     // animation with key 'right'
     this.anims.create({
       key: 'right',
       frames: this.anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13] }),
       frameRate: 10,
       repeat: -1
-     });
+    });
     this.anims.create({
       key: 'up',
       frames: this.anims.generateFrameNumbers('player', { frames: [2, 8, 2, 14]}),
@@ -94,9 +88,9 @@ export const WorldScene = new Phaser.Class({
     this.physics.add.collider(this.player, obstacles);
 
     this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
-    for(let i = 0; i < 30; i++){
-      var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-      var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+    for (let i = 0; i < 30; i += 1) {
+      const x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+      const y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
       this.spawns.create(x, y, 20, 20);
     }
     this.physics.add.overlap(this.player, this.spawns, this.onEnemyMeet, false, this);
@@ -106,48 +100,38 @@ export const WorldScene = new Phaser.Class({
   update(time, delta) {
     this.player.body.setVelocity(0);
 
-    if(this.cursor.left.isDown) {
+    if (this.cursor.left.isDown) {
       this.player.body.setVelocityX(-80);
-    }
-    else if(this.cursor.right.isDown) {
+    } else if (this.cursor.right.isDown) {
       this.player.body.setVelocityX(80);
     }
 
-    
-    if(this.cursor.up.isDown) {
+    if (this.cursor.up.isDown) {
       this.player.body.setVelocityY(-80);
-    }
-    else if(this.cursor.down.isDown) {
+    } else if (this.cursor.down.isDown) {
       this.player.body.setVelocityY(80);
     }
 
-    if (this.cursor.left.isDown)
-        {
-            this.player.anims.play('left', true);
-        }
-        else if (this.cursor.right.isDown)
-        {
-            this.player.anims.play('right', true);
-        }
-        else if (this.cursor.up.isDown)
-        {
-            this.player.anims.play('up', true);
-        }
-        else if (this.cursor.down.isDown)
-        {
-            this.player.anims.play('down', true);
-        }
-        else
-        {
-            this.player.anims.stop();
-        }
+    if (this.cursor.left.isDown) {
+      this.player.anims.play('left', true);
+      this.flipX = true;
+    } else if (this.cursor.right.isDown) {
+      this.player.anims.play('right', true);
+      this.flipX = false;
+    } else if (this.cursor.up.isDown) {
+      this.player.anims.play('up', true);
+    } else if (this.cursor.down.isDown) {
+      this.player.anims.play('down', true);
+    } else {
+      this.player.anims.stop();
+    }
   },
 
   onEnemyMeet(player, zone) {
     // start battle
     zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-    zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height); 
-    
+    zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+
     this.cameras.main.shake(300);
 
     this.scene.switch('BattleScene');

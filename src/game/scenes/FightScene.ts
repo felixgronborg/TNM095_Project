@@ -6,45 +6,6 @@ import { BehaviorTreeBuilder, BehaviorTreeStatus, TimeData } from 'fluent-behavi
 require('babel-core/register');
 require('babel-polyfill');
 
-
-
-export const FightScene = new Phaser.Class({
-  Extends: Phaser.Scene,
-
-  initialize:
-
-  function FightScene() {
-    Phaser.Scene.call(this, { key: 'FightScene' });
-  },
-
-  preload() {
-    console.debug('Preload');
-    /*
-    this.load.image('hero1', 'assets/HeroFrall.png');
-    this.load.image('hero2', 'assets/HeroLix.png');
-    this.load.image('enemy1', 'assets/enmyTard.png');
-    this.load.image('enemy2', 'assets/enmySpooks.png');
-    */
-    this.load.spritesheet('hero1_frames', 'assets/HeroFrall_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('hero2_frames', 'assets/HeroLix_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('enemy1_frames', 'assets/enmyTard_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('enemy2_frames', 'assets/enmySpooks_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-  },
-
-  create() {
-    console.debug('Create');
-    this.scene.start('BattleScene');
-  }
-});
-
 export const BattleScene = new Phaser.Class({
   Extends: Phaser.Scene,
 
@@ -62,18 +23,16 @@ export const BattleScene = new Phaser.Class({
     this.load.image('enemy1', 'assets/enmyTard.png');
     this.load.image('enemy2', 'assets/enmySpooks.png');
     */
-    this.load.spritesheet('hero1_frames', 'assets/HeroFrall_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('hero2_frames', 'assets/HeroLix_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('enemy1_frames', 'assets/enmyTard_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
-    this.load.spritesheet('enemy2_frames', 'assets/enmySpooks_frames.png', {
-      frameWidth: 96,
-      frameHeight: 84});
+
+    // 96 x 96, 6x6, 16x16 px
+    this.load.spritesheet('hero_frames', 'assets/Heroes.png', {
+      frameWidth: 16,
+      frameHeight: 16});
+
+      // 480 x 620, 10x13, 48x48 px för standardstora x2, x4 för större
+    this.load.spritesheet('enemy_frames', 'assets/Enemies.png', {
+      frameWidth: 48,
+      frameHeight: 48});
   },
 
   create() {
@@ -110,21 +69,21 @@ export const BattleScene = new Phaser.Class({
   startBattle() {
     // Heroes
     const fralle = new PlayerCharacter(
-      this, 250, 50, 'hero1_frames', 0, 'Fralle', 'Water', 200, 30, 1);
+      this, 250, 50, 'hero_frames', 1, 'Fralle', 'Water', 200, 30, 1);
       // this, x, y, assets, frame, name, element, hp, damage, health packs);
     this.add.existing(fralle);
 
     const felix = new PlayerCharacter(
-      this, 250, 100, 'hero2_frames', 0, 'Felix', 'Fire', 200, 30, 1);
+      this, 250, 100, 'hero_frames', 4, 'Felix', 'Fire', 200, 30, 1);
     this.add.existing(felix);
 
     // Enemies
     const spooks = new Enemy(
-      this, 50, 50, 'enemy1_frames', 0, 'Spooks', 'Normal', 10, 30, 1);
+      this, 50, 50, 'enemy_frames', 60, 'Spooks', 'Normal', 10, 30, 1);
     this.add.existing(spooks);
 
     const zombs = new Enemy( // HP SET TO 9
-      this, 50, 100, 'enemy2_frames', 0, 'Zombs', 'Earth', 10, 30, 1);
+      this, 50, 100, 'enemy_frames', 61, 'Zombs', 'Earth', 10, 30, 1);
     this.add.existing(zombs);
 
     this.heroes = [fralle, felix];
@@ -368,7 +327,8 @@ const Enemy = new Phaser.Class({
   initialize:
   function Enemy(scene, x, y, texture, frame, type, element, hp, damage, healthPack) {
     unit.call(this, scene, x, y, texture, frame, type, element, hp, damage, healthPack);
-    this.setScale(0.5);
+    this.flipX = false;
+    this.setScale(1);
   }
 });
 
@@ -378,8 +338,8 @@ const PlayerCharacter = new Phaser.Class({
   initialize:
   function Enemy(scene, x, y, texture, frame, type, element, hp, damage, healthPack) {
     unit.call(this, scene, x, y, texture, frame, type, element, hp, damage, healthPack);
-    // this.flipX = true;
-    this.setScale(0.5);
+    this.flipX = true;
+    this.setScale(3);
   }
 });
 
