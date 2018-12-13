@@ -22,11 +22,24 @@ export const DeathScene = new Phaser.Class({
 
     const button = this.add.text(135,110, 'Retry?', { fill: '#fff' });
     button.setInteractive();
-
-    this.scene.stop('WorldScene');
-    this.scene.stop('BattleScene');
+    
+    /*
+    this.scene.stop('Battlescene');
     this.scene.stop('UIScene');
+    this.scene.stop('GameScene');
+    */
 
-    button.on('pointerdown', () => { this.scene.start('MenuScene'); });
+    let getScene = this.scene.get('WorldScene');
+    // resetGame.scene.restart();
+    //this.scene.start('MenuScene');
+    button.on('pointerdown', () => { this.reboot(); });
+  },
+
+  reboot()
+  {
+    this.getScene = this.scene.get('WorldScene');
+    this.getScene.reset();
+    this.scene.run('WorldScene');
+    this.scene.sleep('DeathScene');
   }
 });

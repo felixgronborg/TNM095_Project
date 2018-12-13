@@ -144,6 +144,11 @@ export const WorldScene = new Phaser.Class({
 
     this.scene.switch('BattleScene');
 
+  },
+
+  reset()
+  {
+    this.player.setPosition(50,100);
   }
 
 });
