@@ -18,20 +18,13 @@ export const DeathScene = new Phaser.Class({
   create: function () {
     this.cameras.main.setBackgroundColor('rgba(0, 200, 0, 0.5)');
 
-    this.add.text(95, 50, 'U ded :(', { fill: '#fff' });
+    this.add.text(110, 50, 'You died :(', { fill: '#fff' });
 
     const button = this.add.text(135,110, 'Retry?', { fill: '#fff' });
     button.setInteractive();
-    
-    /*
-    this.scene.stop('Battlescene');
-    this.scene.stop('UIScene');
-    this.scene.stop('GameScene');
-    */
 
     let getScene = this.scene.get('WorldScene');
-    // resetGame.scene.restart();
-    //this.scene.start('MenuScene');
+
     button.on('pointerdown', () => { this.reboot(); });
   },
 

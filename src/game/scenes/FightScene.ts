@@ -17,22 +17,22 @@ export const BattleScene = new Phaser.Class({
 
   preload() {
     console.debug('Preload');
-    /*
-    this.load.image('hero1', 'assets/HeroFrall.png');
-    this.load.image('hero2', 'assets/HeroLix.png');
-    this.load.image('enemy1', 'assets/enmyTard.png');
-    this.load.image('enemy2', 'assets/enmySpooks.png');
-    */
 
     // 96 x 96, 6x6, 16x16 px
     this.load.spritesheet('hero_frames', 'assets/Heroes.png', {
       frameWidth: 16,
       frameHeight: 16});
 
+      this.load.spritesheet('test_frames', 'assets/testsprite.png', {
+        frameWidth: 70,
+        frameHeight: 70});
+
       // 480 x 620, 10x13, 48x48 px för standardstora x2, x4 för större
     this.load.spritesheet('enemy_frames', 'assets/Enemies.png', {
       frameWidth: 48,
       frameHeight: 48});
+
+
   },
 
   create() {
@@ -41,6 +41,31 @@ export const BattleScene = new Phaser.Class({
     this.startBattle();
 
     let lost = false;
+
+    this.anims.create({
+      key: 'spooksDmg',
+      frames: this.anims.generateFrameNumbers('test_frames', { frames: [0,1,0]}),
+      frameRate: 10,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'zombsDmg',
+      frames: this.anims.generateFrameNumbers('test_frames', { frames: [0,1,0]}),
+      frameRate: 10,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'fralleDmg',
+      frames: this.anims.generateFrameNumbers('test_frames', { frames: [0,1,0]}),
+      frameRate: 10,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'felixDmg',
+      frames: this.anims.generateFrameNumbers('test_frames', { frames: [0,1,0]}),
+      frameRate: 10,
+      repeat: 0
+    });
     
     this.sys.events.on('wake', this.startBattle, this);
   },
@@ -71,21 +96,21 @@ export const BattleScene = new Phaser.Class({
   startBattle() {
     // Heroes
     const fralle = new PlayerCharacter(
-      this, 250, 50, 'hero_frames', 1, 'Fralle', 'Water', 2, 30, 1);
+      this, 250, 50, 'hero_frames', 1, 'Fralle', 'Water', 200, 30, 1);
       // this, x, y, assets, frame, name, element, hp, damage, health packs);
     this.add.existing(fralle);
 
     const felix = new PlayerCharacter(
-      this, 250, 100, 'hero_frames', 4, 'Felix', 'Fire', 2, 30, 1);
+      this, 250, 100, 'hero_frames', 4, 'Felix', 'Fire', 200, 30, 1);
     this.add.existing(felix);
 
     // Enemies
     const spooks = new Enemy(
-      this, 50, 50, 'enemy_frames', 60, 'Spooks', 'Normal', 100, 30, 1);
+      this, 50, 50, 'enemy_frames', 60, 'Spooks', 'Normal', 1, 30, 1);
     this.add.existing(spooks);
 
     const zombs = new Enemy(
-      this, 50, 100, 'enemy_frames', 61, 'Zombs', 'Earth', 100, 30, 1);
+      this, 50, 100, 'enemy_frames', 61, 'Zombs', 'Earth', 1, 30, 1);
     this.add.existing(zombs);
 
     this.heroes = [fralle, felix];
@@ -131,7 +156,7 @@ export const BattleScene = new Phaser.Class({
     }
     this.units.length = 0;
     this.scene.sleep('UIScene');
-    //TODO fix deathscene
+    
     if(this.lost)
     {
       this.lost = false;
@@ -142,17 +167,7 @@ export const BattleScene = new Phaser.Class({
       this.scene.switch('WorldScene');
     }
   },
-  /*
-  exitBattle() {
-    this.scene.sleep('UIScene');
-    this.scene.switch('WorldScene');
-  },
-
-  wake() {
-    this.scene.run('UIScene');
-    this.time.addEvent({delay: 2000, callback: this.exitBattle, callbackScope: this});        
-  },
-  */
+  
   receivePlayerSelection(action, target) {
     if (action === 'attack') {
       this.units[this.index].attack(this.enemies[target]);
@@ -204,12 +219,12 @@ export const BattleScene = new Phaser.Class({
         this.setTarget = i;
         return true;
       }
-      if (currElement === 'Water' && this.heroes[i].element === 'Fire') {
+      if (currElement === 'Water' && this.heroes[i].element === 'Fire' ) {
         console.log('im water', i);
         this.setTarget = i;
         return true;
       }
-      if (currElement === 'Earth' && this.heroes[i].element === 'Water') {
+      if (currElement === 'Earth' && this.heroes[i].element === 'Water' ) {
         console.log('im earth', i);
         this.setTarget = i;
         return true;
@@ -329,10 +344,30 @@ const unit = new Phaser.Class({
       this.alive = false;
       console.log(`${this.type} has died`);
       this.scene.events.emit(`${this.type} has died`); // Does not emit attack message
-      this.setFrame(1);
+      this.setFrame(2);
     }
     console.log(`${this.type} has ${this.hp} left`);
+
+    //TODO figure this out
+    if(this.type == 'Spooks')
+    {
+      this.anims.play('spooksDmg', true);
+    }
+    if(this.type == 'Zombs')
+    {
+      this.anims.play('zombsDmg', true);
+    }
+    if(this.type == 'Fralle')
+    {
+      this.anims.play('fralleDmg', true);
+    }
+    if(this.type == 'Felix')
+    {
+      this.anims.play('felixDmg', true);
+    }
   },
+
+  
 });
 
 const Enemy = new Phaser.Class({
@@ -342,7 +377,6 @@ const Enemy = new Phaser.Class({
   function Enemy(scene, x, y, texture, frame, type, element, hp, damage, healthPack) {
     unit.call(this, scene, x, y, texture, frame, type, element, hp, damage, healthPack);
     this.flipX = false;
-    this.setScale(1);
   }
 });
 
@@ -353,7 +387,6 @@ const PlayerCharacter = new Phaser.Class({
   function Enemy(scene, x, y, texture, frame, type, element, hp, damage, healthPack) {
     unit.call(this, scene, x, y, texture, frame, type, element, hp, damage, healthPack);
     this.flipX = true;
-    this.setScale(3);
   }
 });
 
@@ -451,12 +484,7 @@ const Menu = new Phaser.Class({
   confirm() {
     // when player selects, do the action
   },
-  /*
-  undo() {
-    // When player wants to undo selection
-    // this.currentMenu = this.ActionsMenu; //FUNGERAR INTE
-  },
-  */
+  
   clear() {
     for (let i = 0; i < this.menuItems.length; i += 1) {
       this.menuItems[i].destroy();
@@ -484,21 +512,6 @@ const HeroesMenu = new Phaser.Class({
 
   function HeroesMenu(x, y, scene) {
     Menu.call(this, x, y, scene);
-  }
-});
-
-const pauseMenu = new Phaser.Class({
-  Extends: Menu,
-
-  initialize:
-  function pauseMenu(x, y, scene) {
-    Menu.call(this, x, y, scene);
-    this.addMenuItem('Restart');
-    this.addMenuItem('Do nothing');
-  }, 
-  
-  confrim() {
-    // Select what to do
   }
 });
 
@@ -541,21 +554,6 @@ const EnemiesMenu = new Phaser.Class({
   undo() {
     // this.scene.start(ActionsMenu); // Does nothing
     // this.currentMenu = ActionsMenu;
-  }
-});
-
-const PauseMenu = new Phaser.Class({
-  Extends: Menu,
-
-  initialize:
-  function PauseMenu(x, y, scene) {
-    Menu.call(this, x, y, scene);
-    this.addMenuItem('Restart');
-    this.addMenuItem('Do nothing');
-  }, 
-  
-  confrim() {
-    // Select what to do
   }
 });
 

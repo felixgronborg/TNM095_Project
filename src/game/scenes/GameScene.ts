@@ -19,6 +19,10 @@ export const GameScene = new Phaser.Class({
 
     // our two characters
     this.load.spritesheet('player', 'assets/Heroes.png', { frameWidth: 16, frameHeight: 16 });
+
+    this.load.spritesheet('enemy_frames', 'assets/Enemies.png', {
+      frameWidth: 48,
+      frameHeight: 48});
   },
 
   create() {
@@ -57,15 +61,12 @@ export const WorldScene = new Phaser.Class({
     this.cameras.main.startFollow(this.player);
     this.cameras.main.roundPixels = true;
 
-    // animation with key 'left', we don't need left and right as we will use one and flip the sprite
     this.anims.create({
       key: 'left',
       frames: this.anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13]}),
       frameRate: 10,
       repeat: -1
     });
-
-    // animation with key 'right'
     this.anims.create({
       key: 'right',
       frames: this.anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13] }),
@@ -87,13 +88,21 @@ export const WorldScene = new Phaser.Class({
 
     this.physics.add.collider(this.player, obstacles);
 
+    // enemy spawns
     this.spawns = this.physics.add.group({ classType: Phaser.GameObjects.Zone });
-    for (let i = 0; i < 30; i += 1) {
+    this.sprites = this.physics.add.group({ classType: Phaser.GameObjects.Sprite })
+    for (let i = 0; i < 5; i += 1) {
       const x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
       const y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-      this.spawns.create(x, y, 20, 20);
+      //this.spawns.create(x, y, 45, 45);
+
+      // create enmy sprite for each zone!
+      //this.sprites.create(x, y, 'enemy_frames', 60);
+
+      this.sprites.create(x, y, 'enemy_frames', 60);
+      //this.physics.add.overlap(this.player, this.sprite, this.test, false, this);
     }
-    this.physics.add.overlap(this.player, this.spawns, this.onEnemyMeet, false, this);
+    this.physics.add.overlap(this.player, this.sprites, this.onEnemyMeet, false, this);
 
     this.sys.events.on('wake', this.wake, this);
   },
@@ -122,10 +131,10 @@ export const WorldScene = new Phaser.Class({
 
     if (this.cursor.left.isDown) {
       this.player.anims.play('left', true);
-      this.flipX = true;
+      this.player.flipX = true;
     } else if (this.cursor.right.isDown) {
       this.player.anims.play('right', true);
-      this.flipX = false;
+      this.player.flipX = false;
     } else if (this.cursor.up.isDown) {
       this.player.anims.play('up', true);
     } else if (this.cursor.down.isDown) {
@@ -135,15 +144,21 @@ export const WorldScene = new Phaser.Class({
     }
   },
 
-  onEnemyMeet(player, zone) {
-    // start battle
-    zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-    zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+  onEnemyMeet(player, sprite) {
+    // Probably remove and detroy zone instead
+    //zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+    //zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+    sprite.destroy();
+    //zone.destroy();
 
     this.cameras.main.shake(300);
 
     this.scene.switch('BattleScene');
 
+  },
+
+  test(sprite){
+    sprite.destroy;
   },
 
   reset()

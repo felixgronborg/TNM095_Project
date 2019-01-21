@@ -17,7 +17,7 @@ export const MenuScene = new Phaser.Class({
   create: function () {
     this.cameras.main.setBackgroundColor('rgba(0, 200, 0, 0.5)');
 
-    this.add.text(75, 50, 'Super awesome game', { fill: '#fff' });
+    this.add.text(75, 50, 'Goblin killer RPG', { fill: '#fff' });
 
     const button = this.add.text(135,110, 'Start', { fill: '#fff' });
     button.setInteractive();
