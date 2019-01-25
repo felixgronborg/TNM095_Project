@@ -32,6 +32,7 @@
   "dependencies": {
     "behaviortree": "^2.0.2",
     "fluent-behavior-tree": "^1.2.6",
-    "phaser": "^3.14.0"
+    "phaser": "^3.14.0",
+    "phaser-percent-bar": "^1.1.5"
   }
 }

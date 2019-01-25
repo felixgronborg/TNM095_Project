@@ -1,10 +1,14 @@
 import { BlendModes, Scene } from 'phaser';
 import { BehaviorTreeBuilder, BehaviorTreeStatus, TimeData } from 'fluent-behavior-tree';
+import Game from '@/game';
+//import HealthBar from 'phaser-percent-bar';
 // import BehaviorTree, {Sequence, Task, SUCCESS, FAILURE }  from 'behaviortree';
 // const BehaviorTree = require('behaviortree');
 // const { Sequence, Task, SUCCESS, FAILURE } = BehaviorTree;
 require('babel-core/register');
 require('babel-polyfill');
+//let HealthBar = require('@/phaser.healthbar-master/HealthBar');
+//import { HealthBar } from 'phaser.healthbar-master/HealthBar';
 
 export const BattleScene = new Phaser.Class({
   Extends: Phaser.Scene,
@@ -32,7 +36,7 @@ export const BattleScene = new Phaser.Class({
       frameWidth: 48,
       frameHeight: 48});
 
-
+      this.load.image('healthBar', 'assets/healthbar.png');
   },
 
   create() {
@@ -120,6 +124,22 @@ export const BattleScene = new Phaser.Class({
     this.units = this.heroes.concat(this.enemies);
 
     this.index = -1;
+    
+    let healthBar = new HealthBar(this, 125, 75, 'healthBar');
+    this.add.existing(healthBar);
+    
+    /*Test
+    let game = Game;
+    const sprite = this.add.sprite(125, 75, 'enemy_frames', 60);
+
+    sprite.health = 100;
+    sprite.maxHealth = 100;
+    
+    const healthBar = this.game.add.existing(new HealthBar({
+      game: game,
+      host: sprite
+    }));
+    */
 
     // Run UI scene at the same time
     this.scene.run('UIScene');
@@ -267,6 +287,16 @@ export const BattleScene = new Phaser.Class({
     console.log('after heal', this.units[this.index].hp);
 
     return BehaviorTreeStatus.Success;
+  },
+});
+
+export const HealthBar = new Phaser.Class({
+  Extends: Phaser.GameObjects.Sprite,
+
+  initialize:
+
+  function HealthBar(scene, x, y, texture) {
+    Phaser.GameObjects.Sprite.call(this, scene, x , y, texture)
   },
 });
 
@@ -614,6 +644,30 @@ export const UIScene = new Phaser.Class({
     this.message = new Message(this, this.battleScene.events);
     this.add.existing(this.message);
 
+    
+    /*nvm
+    //let barConfig = {x: 100, y: 100};
+    //this.myHealthBar = new HealthBar(this.game , barConfig);
+    let game = Game;
+    console.log(Game);
+    const sprite = this.add.sprite(125, 75, 'enemy_frames', 60);
+
+    var barConfig = {x: 125, y: 75};
+	  this.myHealthBar = new HealthBar(Game, barConfig);
+
+    
+    /*
+    let game = Game;
+    const sprite = this.add.sprite(125, 75, 'enemy_frames', 60);
+
+    sprite.health = 100;
+    sprite.maxHealth = 100;
+   
+   const healthBar = this.add.existing(new HealthBar({
+     game: this.game,
+     host: sprite
+   }));
+   */
     //this.battleScene.nextTurn();
     this.createMenu();
   },
