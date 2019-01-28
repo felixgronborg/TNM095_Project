@@ -100,21 +100,21 @@ export const BattleScene = new Phaser.Class({
   startBattle() {
     // Heroes
     const fralle = new PlayerCharacter(
-      this, 250, 50, 'hero_frames', 1, 'Fralle', 'Water', 200, 30, 1);
+      this, 250, 50, 'hero_frames', 1, 'Fralle', 'Water', 140, 30, 1);
       // this, x, y, assets, frame, name, element, hp, damage, health packs);
     this.add.existing(fralle);
 
     const felix = new PlayerCharacter(
-      this, 250, 100, 'hero_frames', 4, 'Felix', 'Fire', 200, 30, 1);
+      this, 250, 100, 'hero_frames', 4, 'Felix', 'Fire', 140, 30, 1);
     this.add.existing(felix);
 
     // Enemies
     const spooks = new Enemy(
-      this, 50, 50, 'enemy_frames', 60, 'Spooks', 'Normal', 1, 30, 1);
+      this, 50, 50, 'enemy_frames', 60, 'Spooks', 'Normal', 70, 30, 1);
     this.add.existing(spooks);
 
     const zombs = new Enemy(
-      this, 50, 100, 'enemy_frames', 61, 'Zombs', 'Earth', 1, 30, 1);
+      this, 50, 100, 'enemy_frames', 61, 'Zombs', 'Earth', 70, 30, 1);
     this.add.existing(zombs);
 
     this.heroes = [fralle, felix];
@@ -125,8 +125,22 @@ export const BattleScene = new Phaser.Class({
 
     this.index = -1;
     
-    let healthBar = new HealthBar(this, 125, 75, 'healthBar');
-    this.add.existing(healthBar);
+    this.frallBar = new HealthBar(this, 250, 25, 'healthBar');
+    this.add.existing(this.frallBar);
+
+    this.fellBar = new HealthBar(this, 250, 75, 'healthBar');
+    this.add.existing(this.fellBar);
+
+    this.spookBar = new HealthBar(this, 50, 30, 'healthBar');
+    this.add.existing(this.spookBar);
+
+    this.zombsBar = new HealthBar(this, 50, 75, 'healthBar');
+    this.add.existing(this.zombsBar);
+    
+    //healthBar.setDamage(healthBar, 10);
+
+    //healthBar.setLength(50);
+    //healthBar.scaleX = 0.5;
     
     /*Test
     let game = Game;
@@ -191,12 +205,36 @@ export const BattleScene = new Phaser.Class({
   receivePlayerSelection(action, target) {
     if (action === 'attack') {
       this.units[this.index].attack(this.enemies[target]);
+      if(target === 0)
+      {
+        this.spookBar.setDamage(this.spookBar, 30);
+      }
+      if(target === 1)
+      {
+        this.zombsBar.setDamage(this.zombsBar, 30);
+      }
     }
     if (action === 'elementalAttack') {
       this.units[this.index].elementalAttack(this.enemies[target], this.units[this.index].element);
+      if(target === 0)
+      {
+        this.spookBar.setDamage(this.spookBar, 35);
+      }
+      if(target === 1)
+      {
+        this.zombsBar.setDamage(this.zombsBar, 35);
+      }
     }
     if (action === 'heal') {
       this.units[this.index].useHealthPack();
+      if(this.index === 0)
+      {
+        this.frallBar.setHeal(this.frallBar, 10);
+      }
+      if(this.index === 1)
+      {
+        this.fellBar.setHeal(this.fellBar, 10);
+      }
     }
     // let r = Math.floor(Math.random() * this.heroes.length);
     // this.units[this.index].attack(this.heroes[r]);
@@ -259,6 +297,15 @@ export const BattleScene = new Phaser.Class({
     this.units[this.index].elementalAttack(
       this.heroes[this.setTarget], this.units[this.index].element);
 
+      if(this.setTarget === 0)
+      {
+        this.frallBar.setDamage(this.frallBar, 17.5);
+      }
+      if(this.setTarget === 1)
+      {
+        this.fellBar.setDamage(this.fellBar, 17.5);
+      }
+
     return BehaviorTreeStatus.Success;
 
   },
@@ -267,6 +314,14 @@ export const BattleScene = new Phaser.Class({
     console.log('chucks! Im normal!', this.setTarget); // this.setTarget is undefined
     const r = Math.floor(Math.random() * this.heroes.length);
     this.units[this.index].attack(this.heroes[r]);
+    if(r === 0)
+    {
+      this.frallBar.setDamage(this.frallBar, 15);
+    }
+    if(r === 1)
+    {
+      this.fellBar.setDamage(this.fellBar, 15);
+    }
 
     return BehaviorTreeStatus.Success;
 
@@ -285,6 +340,16 @@ export const BattleScene = new Phaser.Class({
     console.log('before heal', this.units[this.index].hp);
     this.units[this.index].useHealthPack();
     console.log('after heal', this.units[this.index].hp);
+    console.log(this.index)
+
+    if(this.index === 2)
+    {
+      this.spookBar.setHeal(this.spookBar, 20);
+    }
+    if(this.index === 3)
+    {
+      this.zombsBar.setHeal(this.zombsBar, 20);
+    }
 
     return BehaviorTreeStatus.Success;
   },
@@ -296,8 +361,30 @@ export const HealthBar = new Phaser.Class({
   initialize:
 
   function HealthBar(scene, x, y, texture) {
-    Phaser.GameObjects.Sprite.call(this, scene, x , y, texture)
+    let kuk = Phaser.GameObjects.Sprite.call(this, scene, x , y, texture);
+    //console.log(kuk);
   },
+
+  setDamage(bar, damage) {
+    let barWidth = bar.width;
+    barWidth = barWidth - damage;
+    if(barWidth <= 0) {
+      bar.setDisplaySize(0, 7);
+    } else {
+          bar.setDisplaySize(barWidth, 7);
+    }
+    bar.width = barWidth;
+  },
+
+  setHeal(bar, heal) {
+    console.log(bar.width)
+    let barWidth = bar.width;
+    barWidth = barWidth + heal;
+    console.log(bar.width)
+    bar.setDisplaySize(barWidth, 7);
+    bar.width = barWidth;
+    console.log(bar.width)
+  }
 });
 
 const unit = new Phaser.Class({
@@ -307,6 +394,7 @@ const unit = new Phaser.Class({
 
   function unit(scene, x, y, texture, frame, type, element, hp, damage, healthPack) {
     Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame);
+    this.scene = scene;
     this.type = type;
     this.element = element;
     this.maxHp = this.hp = hp;
@@ -417,6 +505,7 @@ const PlayerCharacter = new Phaser.Class({
   function Enemy(scene, x, y, texture, frame, type, element, hp, damage, healthPack) {
     unit.call(this, scene, x, y, texture, frame, type, element, hp, damage, healthPack);
     this.flipX = true;
+    this.setScale(2);
   }
 });
 
