@@ -105,12 +105,12 @@ export const BattleScene = new Phaser.Class({
   startBattle() {
     // Heroes
     const fralle = new PlayerCharacter(
-      this, 250, 50, 'frall_frames', 0, 'Fralle', 'Water', 1, 30, 1);
+      this, 250, 50, 'frall_frames', 0, 'Fralle', 'Water', 140, 30, 1);
       // this, x, y, assets, frame, name, element, hp, damage, health packs);
     this.add.existing(fralle);
 
     const felix = new PlayerCharacter(
-      this, 250, 100, 'felix_frames', 0, 'Felix', 'Fire', 1, 30, 1);
+      this, 250, 100, 'felix_frames', 0, 'Felix', 'Fire', 140, 30, 1);
     this.add.existing(felix);
 
     // Enemies
