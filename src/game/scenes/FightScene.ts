@@ -23,18 +23,23 @@ export const BattleScene = new Phaser.Class({
     console.debug('Preload');
 
     // 96 x 96, 6x6, 16x16 px
-    this.load.spritesheet('hero_frames', 'assets/Heroes.png', {
-      frameWidth: 16,
-      frameHeight: 16});
 
-      this.load.spritesheet('test_frames', 'assets/testsprite.png', {
-        frameWidth: 70,
-        frameHeight: 70});
+    this.load.spritesheet('frall_frames', 'assets/frallsprite-test2.png', {
+        frameWidth: 15,
+        frameHeight: 15});
+
+    this.load.spritesheet('felix_frames', 'assets/Felixsprite-test.png', {
+        frameWidth: 15,
+        frameHeight: 15});
 
       // 480 x 620, 10x13, 48x48 px för standardstora x2, x4 för större
-    this.load.spritesheet('enemy_frames', 'assets/Enemies.png', {
+    this.load.spritesheet('spook_frames', 'assets/spooksprite2.png', {
       frameWidth: 48,
       frameHeight: 48});
+
+      this.load.spritesheet('zomb_frames', 'assets/zombsprite.png', {
+        frameWidth: 48,
+        frameHeight: 48});
 
       this.load.image('healthBar', 'assets/healthbar.png');
   },
@@ -48,26 +53,26 @@ export const BattleScene = new Phaser.Class({
 
     this.anims.create({
       key: 'spooksDmg',
-      frames: this.anims.generateFrameNumbers('test_frames', { frames: [0,1,0]}),
-      frameRate: 10,
+      frames: this.anims.generateFrameNumbers('spook_frames', { frames: [0,1,2,0]}),
+      frameRate: 5,
       repeat: 0
     });
     this.anims.create({
       key: 'zombsDmg',
-      frames: this.anims.generateFrameNumbers('test_frames', { frames: [0,1,0]}),
-      frameRate: 10,
+      frames: this.anims.generateFrameNumbers('zomb_frames', { frames: [0,1,2,0]}),
+      frameRate: 5,
       repeat: 0
     });
     this.anims.create({
       key: 'fralleDmg',
-      frames: this.anims.generateFrameNumbers('test_frames', { frames: [0,1,0]}),
-      frameRate: 10,
+      frames: this.anims.generateFrameNumbers('frall_frames', { frames: [0,1,2,0]}),
+      frameRate: 5,
       repeat: 0
     });
     this.anims.create({
       key: 'felixDmg',
-      frames: this.anims.generateFrameNumbers('test_frames', { frames: [0,1,0]}),
-      frameRate: 10,
+      frames: this.anims.generateFrameNumbers('felix_frames', { frames: [0,1,2,0]}),
+      frameRate: 5,
       repeat: 0
     });
     
@@ -100,21 +105,21 @@ export const BattleScene = new Phaser.Class({
   startBattle() {
     // Heroes
     const fralle = new PlayerCharacter(
-      this, 250, 50, 'hero_frames', 1, 'Fralle', 'Water', 140, 30, 1);
+      this, 250, 50, 'frall_frames', 0, 'Fralle', 'Water', 1, 30, 1);
       // this, x, y, assets, frame, name, element, hp, damage, health packs);
     this.add.existing(fralle);
 
     const felix = new PlayerCharacter(
-      this, 250, 100, 'hero_frames', 4, 'Felix', 'Fire', 140, 30, 1);
+      this, 250, 100, 'felix_frames', 0, 'Felix', 'Fire', 1, 30, 1);
     this.add.existing(felix);
 
     // Enemies
     const spooks = new Enemy(
-      this, 50, 50, 'enemy_frames', 60, 'Spooks', 'Normal', 70, 30, 1);
+      this, 50, 50, 'spook_frames', 0, 'Spooks', 'Normal', 70, 30, 1);
     this.add.existing(spooks);
 
     const zombs = new Enemy(
-      this, 50, 100, 'enemy_frames', 61, 'Zombs', 'Earth', 70, 30, 1);
+      this, 50, 100, 'zomb_frames', 0, 'Zombs', 'Earth', 70, 30, 1);
     this.add.existing(zombs);
 
     this.heroes = [fralle, felix];
@@ -462,12 +467,11 @@ const unit = new Phaser.Class({
       this.alive = false;
       console.log(`${this.type} has died`);
       this.scene.events.emit(`${this.type} has died`); // Does not emit attack message
-      this.setFrame(2);
-    }
-    console.log(`${this.type} has ${this.hp} left`);
-
-    //TODO figure this out
-    if(this.type == 'Spooks')
+      this.setFrame(3);
+      //TODO ggör inte detta, fixa så den gör det
+      
+    } else {
+       if(this.type == 'Spooks')
     {
       this.anims.play('spooksDmg', true);
     }
@@ -483,6 +487,11 @@ const unit = new Phaser.Class({
     {
       this.anims.play('felixDmg', true);
     }
+    }
+    console.log(`${this.type} has ${this.hp} left`);
+
+    //TODO figure this out
+   
   },
 
   

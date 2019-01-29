@@ -94,13 +94,8 @@ export const WorldScene = new Phaser.Class({
     for (let i = 0; i < 5; i += 1) {
       const x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
       const y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-      //this.spawns.create(x, y, 45, 45);
-
-      // create enmy sprite for each zone!
-      //this.sprites.create(x, y, 'enemy_frames', 60);
 
       this.sprites.create(x, y, 'enemy_frames', 60);
-      //this.physics.add.overlap(this.player, this.sprite, this.test, false, this);
     }
     this.physics.add.overlap(this.player, this.sprites, this.onEnemyMeet, false, this);
 

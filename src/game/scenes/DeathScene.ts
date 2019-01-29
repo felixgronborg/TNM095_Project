@@ -12,16 +12,26 @@ export const DeathScene = new Phaser.Class({
       Phaser.Scene.call(this, { key: 'DeathScene' });
   },
 
-  preload: function () { 
+  preload: function () {
+    this.load.image('skull', 'assets/skull.png');
+
   },
 
   create: function () {
     this.cameras.main.setBackgroundColor('rgba(0, 200, 0, 0.5)');
 
-    this.add.text(110, 50, 'You died :(', { fill: '#fff' });
+    this.add.text(95, 50, 'You have died!', { fill: '#fff' });
 
-    const button = this.add.text(135,110, 'Retry?', { fill: '#fff' });
+    this.skull = this.physics.add.sprite(160, 110, 'skull');
+    this.skull.setScale(0.5);
+
+
+    let button = this.add.text(135,170, 'Retry?', { fill: '#fff' });
     button.setInteractive();
+
+    button.on('pointerover', () => { button.setFill('#ff0000'); });
+    button.on('pointerout', () => { button.setFill('#ffffff'); });
+
 
     let getScene = this.scene.get('WorldScene');
 

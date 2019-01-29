@@ -27,7 +27,7 @@ export const phaserConfig: GameConfig = {
     arcade: {
       gravity: { y: 0 },
       // remember to change!
-      debug: true
+      debug: false
     }
   },
 };
